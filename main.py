@@ -15,6 +15,12 @@ def DistortCamera(img1):
     cv2.undistort(img1,IntrinsicMatrix,DistortionCoeffs,img2)
     return img2
 
+#寻找手指轮廓与坐标
+def Fincounters(img):
+
+
+
+
 
 cap=cv2.VideoCapture(0)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH,1920)
