@@ -56,20 +56,20 @@ while cap.isOpened():
      gaussianResult = cv2.GaussianBlur(imggray,(5,5),1.5) #高斯滤波
      ret,mask =cv2.threshold(gaussianResult,175,255,cv2.THRESH_BINARY)#二值化
 
-     kernel=cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(3,3))
+     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(6,6))
      opened = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel) #开运算
 
-     contours,hierarchy=cv2.findContours(opened,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+     contours,hierarchy = cv2.findContours(opened,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
      #cv2.drawContours(img,contours,-1,(0,0,255),3)
-
+     # print('contours[0]',contours[0])
      if len(contours) != 0:#轮廓总数
          M = cv2.moments(contours[0]) # 计算第一条轮廓的各阶矩,字典形式
          center_x = int(M["m10"] / M["m00"])
          center_y = int(M["m01"] / M["m00"])
          # h1,w1 = opened.shape
          # image = np.zeros([h1, w1], dtype=opened.dtype)
-         cv2.drawContours(img,contours,-1,(0,0,255),3)         # cv2.drawContours(img, contours, 0, 255, -1)#绘制轮廓，填充
-         cv2.circle(img, (center_x, center_y), 7, 128, -1)#绘制中心点
+         cv2.drawContours(img,contours,-1,(0,0,255),3)      # cv2.drawContours(img, contours, 0, 255, -1)#绘制轮廓，填充
+         cv2.circle(img, (center_x, center_y), 7, 128, -1)  #绘制中心点
          # print("center_x, center_y",center_x, center_y)
 
      fx = px1*pow(center_x,2)+px2*center_x+px3
@@ -80,7 +80,7 @@ while cap.isOpened():
      endtime = time.time()
      seconds = endtime - starttime
      fps = 1/seconds
-     print("fps:",fps)
+     #print("fps:",fps)
 
      cv2.namedWindow('2', cv2.WINDOW_NORMAL)    # 窗口大小可以改变
      cv2.resizeWindow('2',960, 540)
@@ -93,11 +93,7 @@ while cap.isOpened():
 
      min_distance= min(k)
      min_distance_index=k.index(min_distance)
-     # print('min_distance',min_distance)
-     # print('lenk',len(k))
-     # print('k',k)
-     # print('index',min_distance_index)
-     print(list(keyboard_dit.items())[min_distance_index])
+     print(list(keyboard_dit.items())[min_distance_index][0])
 
      if cv2.waitKey(5)&0xFF==ord('q'):
       break
