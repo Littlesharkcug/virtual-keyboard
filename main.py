@@ -18,7 +18,12 @@ def DistortCamera(img1):
 #寻找手指轮廓与坐标
 # def Fincounters(img):
 
-
+px1 = -3.426e-05
+px2 = 0.03892
+px3= 21.87
+py1 =  5.297e-05
+py2 =  -0.1072
+py3 =  52.37
 
 
 
@@ -43,27 +48,27 @@ while cap.isOpened():
      img = DistortCamera(frame)
      imggray =cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)#转灰度图
      gaussianResult = cv2.GaussianBlur(imggray,(5,5),1.5) #高斯滤波
-     ret,mask =cv2.threshold(gaussianResult,200,255,cv2.THRESH_BINARY)#二值化
+     ret,mask =cv2.threshold(gaussianResult,175,255,cv2.THRESH_BINARY)#二值化
 
-     kernel=cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(5,5))
+     kernel=cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(3,3))
      opened = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel) #开运算
 
      contours,hierarchy=cv2.findContours(opened,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
-     # cv2.drawContours(img,contours,-1,(0,0,255),3)
+     #cv2.drawContours(img,contours,-1,(0,0,255),3)
 
-     # if len(contours) != 1:#轮廓总数
+     if len(contours) != 0:#轮廓总数
+         M = cv2.moments(contours[0]) # 计算第一条轮廓的各阶矩,字典形式
+         center_x = int(M["m10"] / M["m00"])
+         center_y = int(M["m01"] / M["m00"])
+         # h1,w1 = opened.shape
+         # image = np.zeros([h1, w1], dtype=opened.dtype)
+         cv2.drawContours(img,contours,-1,(0,0,255),3)         # cv2.drawContours(img, contours, 0, 255, -1)#绘制轮廓，填充
+         cv2.circle(img, (center_x, center_y), 7, 128, -1)#绘制中心点
+         # print("center_x, center_y",center_x, center_y)
 
-
-     M = cv2.moments(contours[0]) # 计算第一条轮廓的各阶矩,字典形式
-     center_x = int(M["m10"] / M["m00"])
-     center_y = int(M["m01"] / M["m00"])
-     # h1,w1 = opened.shape
-     # image = np.zeros([h1, w1], dtype=opened.dtype)
-     cv2.drawContours(img,contours,-1,(0,0,255),3)
-     # cv2.drawContours(img, contours, 0, 255, -1)#绘制轮廓，填充
-     cv2.circle(img, (center_x, center_y), 7, 128, -1)#绘制中心点
-     print("center_x, center_y",center_x, center_y)
-
+     fx = px1*pow(center_x,2)+px2*center_x+px3
+     fy = py1*pow(center_y,2)+py2*center_y+py3
+     print("fx , fy: ",fx ,fy)
 
      #计算FPS
      endtime = time.time()
