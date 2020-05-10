@@ -25,18 +25,24 @@ py1 =  5.297e-05
 py2 =  -0.1072
 py3 =  52.37
 
-
+#键值 字典
+keyboard_dit = {'q':(9.5,9.5),'w':(13,9.5),'e':(16.5,9.6),'r':(20,9.6),'t':(22.5,9.6),'y':(26,9.3),'u':(29.2,9.3),'i':(32.1,9.3),'o':(35.2,9.2),'p':(38.5,9),
+       'a':(10.7,11.2),'s':(14,11.2),'d':(17.2,11.2),'f':(20.5,11.2),'g':(24,11.1),'h':(26.5,11),'j':(30,11),'k':(33,11),'l':(35.5,11),
+       'z':(13,13.1),'x':(16,13.1),'c':(19,13.1),'v':(22.3,13),'b':(25.2,13),'n':(28,13),'m':(31,13)}
+k=[]  #空数组 用来装 欧氏距离
 
 cap=cv2.VideoCapture(0)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH,1920)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT,1080)
 cap.set(cv2.CAP_PROP_EXPOSURE,-8)  #调整相机曝光 用AmCap软件测试 这个数值比较可以用
-num = 1
+num = 0
+
 while cap.isOpened():
      read,frame=cap.read()
      if not read:
        break
 
+     k=[]  #需要清零 否则会在上一轮基础上增加
      starttime = time.time()
      # 原图像
      # cv2.namedWindow('1', cv2.WINDOW_NORMAL)    # 窗口大小可以改变
@@ -79,6 +85,19 @@ while cap.isOpened():
      cv2.namedWindow('2', cv2.WINDOW_NORMAL)    # 窗口大小可以改变
      cv2.resizeWindow('2',960, 540)
      cv2.imshow("2",img)
+
+     #计算键值
+     for values in keyboard_dit.values():
+        distance=pow(values[0]-fx,2)+pow(values[1]-fy,2)
+        k.append(distance)
+
+     min_distance= min(k)
+     min_distance_index=k.index(min_distance)
+     # print('min_distance',min_distance)
+     # print('lenk',len(k))
+     # print('k',k)
+     # print('index',min_distance_index)
+     print(list(keyboard_dit.items())[min_distance_index])
 
      if cv2.waitKey(5)&0xFF==ord('q'):
       break
