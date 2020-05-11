@@ -2,7 +2,7 @@
 import cv2
 import numpy as np
 import time
-
+import keyboard
 
 
 def DistortCamera(img1):
@@ -30,6 +30,8 @@ keyboard_dit = {'q':(9.5,9.5),'w':(13,9.5),'e':(16.5,9.6),'r':(20,9.6),'t':(22.5
        'a':(10.7,11.2),'s':(14,11.2),'d':(17.2,11.2),'f':(20.5,11.2),'g':(24,11.1),'h':(26.5,11),'j':(30,11),'k':(33,11),'l':(35.5,11),
        'z':(13,13.1),'x':(16,13.1),'c':(19,13.1),'v':(22.3,13),'b':(25.2,13),'n':(28,13),'m':(31,13)}
 k=[]  #空数组 用来装 欧氏距离
+compare_list = [0,0] #用来比对前后两个按键是否相同相同就不输出
+compare_I = 0
 
 cap=cv2.VideoCapture(0)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH,1920)
@@ -72,9 +74,14 @@ while cap.isOpened():
          cv2.circle(img, (center_x, center_y), 7, 128, -1)  #绘制中心点
          # print("center_x, center_y",center_x, center_y)
 
-     fx = px1*pow(center_x,2)+px2*center_x+px3
-     fy = py1*pow(center_y,2)+py2*center_y+py3
-     print("fx , fy: ",fx ,fy)
+     fx_temp = px1*pow(center_x,2)+px2*center_x+px3
+     fy_temp = py1*pow(center_y,2)+py2*center_y+py3
+     # print("fx , fy: ",fx ,fy)
+
+     #滤去无用的值fx>40或者fy>16就在键盘之外
+     if (fx_temp<=40) & (fy_temp<=16):
+         fx=fx_temp
+         fy=fy_temp
 
      #计算FPS
      endtime = time.time()
@@ -90,10 +97,20 @@ while cap.isOpened():
      for values in keyboard_dit.values():
         distance=pow(values[0]-fx,2)+pow(values[1]-fy,2)
         k.append(distance)
-
      min_distance= min(k)
      min_distance_index=k.index(min_distance)
-     print(list(keyboard_dit.items())[min_distance_index][0])
+     keynum =list(keyboard_dit.items())[min_distance_index][0] #获取键值
+
+     #引入不重复按键功能 防止手指不动时也会一直按键
+     compare_list[compare_I] = keynum
+     if compare_I == 0:
+        compare_I=1
+     elif compare_I == 1:
+        compare_I = 0
+     # print('compare_list',compare_list)
+     if(compare_list[0] != compare_list[1] ):
+      print('keynum',keynum)
+      keyboard.key_press(keynum)
 
      if cv2.waitKey(5)&0xFF==ord('q'):
       break
